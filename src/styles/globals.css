@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-amber-pale: #FFE49E;
+  --color-amber: #FCBA48;
+  --color-amber-deep: #EE8E28;
+  --color-amber-rust: #B25A12;
+  --color-ink: #140D07;
+  --color-bg-light: #FBF6EE;
+  --color-bg-dark: #100C08;
+  --color-text-light: #4A3B2A;
+  --color-text-dark: #E2D5C3;
+  --color-conflict: #C4451C;
+  color-scheme: dark light;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  background-color: #FBF6EE;
+  color: #140D07;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+html.dark body {
+  background-color: #100C08;
+  color: #FBF6EE;
+}
+
+button, input, textarea, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid #EE8E28;
+  outline-offset: 2px;
+}
+::selection { background: #FFE49E; color: #140D07; }
+
+@layer components {
+  .field-label {
+    @apply mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#4A3B2A] dark:text-[#E2D5C3];
+  }
+  .field-input {
+    @apply w-full rounded-xl border border-[#140D07]/15 bg-white px-3.5 py-3 text-sm text-[#140D07] transition focus:border-[#EE8E28] focus:outline-none focus:ring-2 focus:ring-[#FCBA48]/40 dark:border-white/15 dark:bg-[#140D07] dark:text-white dark:placeholder:text-white/40;
+  }
+  .app-shell {
+    @apply min-h-screen bg-[#FBF6EE] text-[#140D07] transition-colors duration-200 dark:bg-[#100C08] dark:text-white;
+  }
+}
+
+/* ==========================================================================
+   Clerk Dark Mode & Popover Styles
+   ========================================================================== */
+.cl-userButtonPopoverCard {
+  background-color: #FFFFFF !important;
+  border: 1px solid rgba(20, 13, 7, 0.1) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 40px rgba(20, 13, 7, 0.12) !important;
+}
+
+html.dark .cl-userButtonPopoverCard {
+  background-color: #18130E !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.cl-userButtonPopoverMain {
+  background-color: transparent !important;
+}
+
+html.dark .cl-userButtonPopoverMain {
+  background-color: #18130E !important;
+}
+
+.cl-userPreview {
+  background-color: transparent !important;
+  color: #140D07 !important;
+}
+
+html.dark .cl-userPreview {
+  color: #FFFFFF !important;
+}
+
+.cl-userPreviewMainIdentifier {
+  color: #140D07 !important;
+  font-weight: 600 !important;
+}
+
+html.dark .cl-userPreviewMainIdentifier {
+  color: #FFFFFF !important;
+}
+
+.cl-userPreviewSecondaryIdentifier {
+  color: #4A3B2A !important;
+}
+
+html.dark .cl-userPreviewSecondaryIdentifier {
+  color: #E2D5C3 !important;
+}
+
+.cl-userButtonPopoverActionButton {
+  color: #140D07 !important;
+  transition: background-color 150ms ease !important;
+}
+
+.cl-userButtonPopoverActionButton:hover {
+  background-color: rgba(252, 186, 72, 0.15) !important;
+}
+
+html.dark .cl-userButtonPopoverActionButton {
+  color: #FFFFFF !important;
+}
+
+html.dark .cl-userButtonPopoverActionButton:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.cl-userButtonPopoverActionButtonIcon {
+  color: #EE8E28 !important;
+}
+
+html.dark .cl-userButtonPopoverActionButtonIcon {
+  color: #FCBA48 !important;
+}
+
+.cl-userButtonPopoverFooter {
+  display: none !important;
+}
+
+/* Clerk UserProfile Modal (Account Details Modal) */
+.cl-modalBackdrop {
+  background-color: rgba(20, 13, 7, 0.6) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+html.dark .cl-modalBackdrop {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.cl-modalContent {
+  background-color: #FFFFFF !important;
+  border-radius: 1.5rem !important;
+  border: 1px solid rgba(20, 13, 7, 0.1) !important;
+}
+
+html.dark .cl-modalContent {
+  background-color: #18130E !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .cl-card {
+  background-color: #18130E !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .cl-navbar {
+  background-color: #140D07 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .cl-navbarMobileMenuRow {
+  background-color: #140D07 !important;
+}
+
+html.dark .cl-navbarButton {
+  color: #E2D5C3 !important;
+}
+
+html.dark .cl-navbarButton[data-active="true"],
+html.dark .cl-navbarButton:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .cl-scrollBox {
+  background-color: #18130E !important;
+}
+
+html.dark .cl-page {
+  background-color: #18130E !important;
+}
+
+html.dark .cl-headerTitle {
+  color: #FFFFFF !important;
+}
+
+html.dark .cl-headerSubtitle {
+  color: #E2D5C3 !important;
+}
+
+html.dark .cl-profileSection {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .cl-profileSectionTitle {
+  color: #FFFFFF !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .cl-profileSectionTitleText {
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+}
+
+html.dark .cl-profileSectionContent {
+  color: #E2D5C3 !important;
+}
+
+html.dark .cl-profileSectionPrimaryButton {
+  color: #FCBA48 !important;
+}
+
+html.dark .cl-profileSectionPrimaryButton:hover {
+  color: #FFE49E !important;
+}
+
+html.dark .cl-formFieldLabel {
+  color: #E2D5C3 !important;
+}
+
+html.dark .cl-formFieldInput {
+  background-color: #140D07 !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .cl-badge {
+  background-color: rgba(252, 186, 72, 0.2) !important;
+  color: #FCBA48 !important;
+  border: 1px solid rgba(252, 186, 72, 0.4) !important;
+}
+
+html.dark .cl-menuButton,
+html.dark .cl-menuItem {
+  color: #FFFFFF !important;
+}
+
+html.dark .cl-menuList {
+  background-color: #18130E !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Fix for dark mode secondary text / email identifiers inside Clerk modal */
+html.dark .cl-internal-b3fm6y,
+html.dark .cl-internal-1dauvpw,
+html.dark .cl-internal-1x6k0a0,
+html.dark .cl-providerIcon__google,
+html.dark .cl-userPreviewTextContainer span,
+html.dark [class*="cl-userPreviewSecondaryIdentifier"],
+html.dark [class*="cl-profileSectionContent"],
+html.dark [class*="cl-formattedPhoneNumber"],
+html.dark [class*="cl-navbarButton"] {
+  color: #E2D5C3 !important;
+}
+
+html.dark [class*="cl-navbar"] {
+  background-color: #140D07 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark [class*="cl-headerTitle"],
+html.dark [class*="cl-profileSectionTitleText"] {
+  color: #FFFFFF !important;
+}
