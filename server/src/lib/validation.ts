@@ -93,10 +93,6 @@ export function normalizeCoreBaseUrl(input: string): string {
   if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
     throw new Error("Core URL must use HTTP or HTTPS");
   }
-  const isLoopback = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1" || parsed.hostname === "::1" || parsed.hostname === "[::1]";
-  if (parsed.protocol === "http:" && !isLoopback) {
-    throw new Error("Core URL must use HTTPS unless it is a loopback address");
-  }
   if (parsed.username || parsed.password || parsed.search || parsed.hash) {
     throw new Error("Core URL must not include credentials, a query, or a fragment");
   }
