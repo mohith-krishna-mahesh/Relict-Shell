@@ -139,7 +139,17 @@ export function GraphTab({ active, selectedStrategyIds, onStrategiesLoaded, onSt
           onEvent: ingest,
           onMessage: ingest,
           onError: (reason: unknown) => { if (mounted) { setStreaming(false); setStreamError(getErrorMessage(reason, 'The live stream stopped. Partial graph data has been preserved.')); } },
-          onComplete: () => { if (mounted) setStreaming(false); },
+          onComplete: async () => {
+            if (mounted) {
+              setStreaming(false);
+              try {
+                const finalSnapshot = await getRun(coreRunId);
+                if (mounted) ingest(finalSnapshot);
+              } catch {
+                // Ignore snapshot fetch error on completion
+              }
+            }
+          },
         };
         closeStream = openRunStream(coreRunId, handlers);
       } catch (reason) {

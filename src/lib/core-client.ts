@@ -112,28 +112,44 @@ export interface RunStreamHandlers {
   onComplete?: () => void;
 }
 
-const EVENT_NAMES = ['node_added', 'edge_scored', 'strategy_ready', 'run_complete'] as const;
+const EVENT_NAMES = [
+  'node_added',
+  'edge_scored',
+  'strategy_ready',
+  'run_complete',
+  'stage',
+  'complete',
+  'failed',
+] as const;
 
 export function openRunStream(runId: string, handlers: RunStreamHandlers): () => void {
   const stream = new EventSource(`/api/core/v1/runs/${encodeURIComponent(runId)}/stream`, { withCredentials: true });
 
+  const handleData = (dataStr: string, eventType: string) => {
+    try {
+      const payload: unknown = JSON.parse(dataStr);
+      handlers.onEvent?.(payload, eventType);
+      handlers.onMessage?.(payload);
+      if (eventType === 'run_complete' || eventType === 'complete' || eventType === 'failed') {
+        handlers.onComplete?.();
+        stream.close();
+      }
+    } catch {
+      handlers.onError?.(new Error(`Core sent malformed ${eventType} event data.`));
+    }
+  };
+
   const listeners = EVENT_NAMES.map((type) => {
     const listener = (event: MessageEvent<string>) => {
-      try {
-        const payload: unknown = JSON.parse(event.data);
-        handlers.onEvent?.(payload, type);
-        handlers.onMessage?.(payload);
-        if (type === 'run_complete') {
-          handlers.onComplete?.();
-          stream.close();
-        }
-      } catch {
-        handlers.onError?.(new Error(`Core sent malformed ${type} event data.`));
-      }
+      handleData(event.data, type);
     };
     stream.addEventListener(type, listener as EventListener);
     return [type, listener] as const;
   });
+
+  stream.onmessage = (event: MessageEvent<string>) => {
+    handleData(event.data, 'message');
+  };
 
   stream.onerror = () => {
     handlers.onError?.(new Error('The Core event stream was interrupted.'));
