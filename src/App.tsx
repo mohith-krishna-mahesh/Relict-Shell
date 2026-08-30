@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 import { dark } from '@clerk/themes';
 import { ThemeProvider, useTheme } from '@/lib/theme';
+import { RootErrorBoundary, MissingConfigScreen } from '@/components/ErrorStates';
 import { CoreConnectionProvider } from './app/auth/AuthGuard';
 import { EntryPage } from './app/entry/EntryPage';
 import { SignInPage } from './app/auth/SignInPage';
@@ -15,10 +16,12 @@ import { KnowledgeGraphPage } from './app/project/knowledge-graph/KnowledgeGraph
 import { SettingsPage } from './app/settings/SettingsPage';
 import { WorkspacePage } from './app/workspace/WorkspacePage';
 
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.trim();
 
-if (!CLERK_PUBLISHABLE_KEY) {
-  console.error('Missing VITE_CLERK_PUBLISHABLE_KEY in environment variables.');
+function isValidClerkKey(key?: string): boolean {
+  if (!key) return false;
+  if (key.includes('...') || key.includes('your_') || key.includes('placeholder')) return false;
+  return (key.startsWith('pk_test_') || key.startsWith('pk_live_')) && key.length > 20;
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -36,9 +39,21 @@ function ThemedClerkProvider({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
+  if (!isValidClerkKey(CLERK_PUBLISHABLE_KEY)) {
+    return (
+      <MissingConfigScreen
+        reason={
+          !CLERK_PUBLISHABLE_KEY
+            ? 'VITE_CLERK_PUBLISHABLE_KEY is not defined in the environment.'
+            : 'VITE_CLERK_PUBLISHABLE_KEY contains an unconfigured placeholder key.'
+        }
+      />
+    );
+  }
+
   return (
     <ClerkProvider
-      publishableKey={CLERK_PUBLISHABLE_KEY || ''}
+      publishableKey={CLERK_PUBLISHABLE_KEY}
       appearance={{
         baseTheme: isDark ? dark : undefined,
         variables: {
@@ -92,78 +107,80 @@ function ThemedClerkProvider({ children }: { children: React.ReactNode }) {
 
 export function App() {
   return (
-    <ThemeProvider>
-      <ThemedClerkProvider>
-        <BrowserRouter>
-          <CoreConnectionProvider>
-            <Routes>
-              {/* Entry / Landing page */}
-              <Route
-                path="/"
-                element={
-                  <>
-                    <SignedIn>
-                      <Navigate to="/workspace" replace />
-                    </SignedIn>
-                    <SignedOut>
-                      <EntryPage />
-                    </SignedOut>
-                  </>
-                }
-              />
+    <RootErrorBoundary>
+      <ThemeProvider>
+        <ThemedClerkProvider>
+          <BrowserRouter>
+            <CoreConnectionProvider>
+              <Routes>
+                {/* Entry / Landing page */}
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <SignedIn>
+                        <Navigate to="/workspace" replace />
+                      </SignedIn>
+                      <SignedOut>
+                        <EntryPage />
+                      </SignedOut>
+                    </>
+                  }
+                />
 
-              {/* Auth routes */}
-              <Route path="/sign-in/*" element={<SignInPage />} />
-              <Route path="/sign-up/*" element={<SignUpPage />} />
+                {/* Auth routes */}
+                <Route path="/sign-in/*" element={<SignInPage />} />
+                <Route path="/sign-up/*" element={<SignUpPage />} />
 
-              {/* Authenticated app routes */}
-              <Route
-                path="/workspace"
-                element={
-                  <ProtectedRoute>
-                    <WorkspacePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute>
-                    <SettingsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/connect-core"
-                element={
-                  <ProtectedRoute>
-                    <ConnectCorePage />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Authenticated app routes */}
+                <Route
+                  path="/workspace"
+                  element={
+                    <ProtectedRoute>
+                      <WorkspacePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <SettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/connect-core"
+                  element={
+                    <ProtectedRoute>
+                      <ConnectCorePage />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Project routes */}
-              <Route
-                path="/projects/:projectId"
-                element={
-                  <ProtectedRoute>
-                    <ProjectLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<OverviewPage />} />
-                <Route path="planner" element={<PlannerPage />} />
-                <Route path="knowledge-graph" element={<KnowledgeGraphPage />} />
-                <Route path="runs" element={<RunsPage />} />
-              </Route>
+                {/* Project routes */}
+                <Route
+                  path="/projects/:projectId"
+                  element={
+                    <ProtectedRoute>
+                      <ProjectLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<OverviewPage />} />
+                  <Route path="planner" element={<PlannerPage />} />
+                  <Route path="knowledge-graph" element={<KnowledgeGraphPage />} />
+                  <Route path="runs" element={<RunsPage />} />
+                </Route>
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </CoreConnectionProvider>
-        </BrowserRouter>
-      </ThemedClerkProvider>
-    </ThemeProvider>
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </CoreConnectionProvider>
+          </BrowserRouter>
+        </ThemedClerkProvider>
+      </ThemeProvider>
+    </RootErrorBoundary>
   );
 }
 
